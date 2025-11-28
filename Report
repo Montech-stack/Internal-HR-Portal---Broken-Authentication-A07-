@@ -1,0 +1,81 @@
+🛡️ Penetration Test Report: Internal HR Portal
+
+Target: hr-portal.internal.corp
+
+Scope: User login functionality, password reset, and session handling.
+
+1. Executive Summary
+
+This report details findings from the Broken Authentication testing phase against the internal HR Portal. The primary finding is a Critical Risk due to the complete lack of rate limiting on the /login endpoint, enabling an attacker to perform an infinite, low-velocity, online brute-force attack against any user account.
+
+Key Findings Identified:
+
+Critical Risk: Missing rate limiting, leading to successful brute-forcing of credentials.
+
+Low Risk: Weak password policy allows short, simple, or dictionary passwords.
+
+The exploitation of this flaw allows an unauthenticated attacker to gain access to sensitive employee data (salaries, performance reviews, PII) stored within the HR system. 
+
+2. Methodology
+
+Testing focused exclusively on the user login and session management processes using Burp Suite to analyze response times and retry limits.
+
+Technique
+
+Objective
+
+Primary Tools Used
+
+Brute Force Analysis
+
+Test the system's defensive reaction (rate limiting, account lockouts) to rapid, invalid login attempts.
+
+Burp Suite Intruder
+
+Password Policy Analysis
+
+Attempt to register/set simple or common dictionary passwords.
+
+Manual Testing
+
+3. Findings Log
+
+3.1. Authentication Findings (A07)
+
+Finding ID
+
+Title
+
+Description
+
+Data Captured / Proof
+
+Risk Level
+
+AUTH-001
+
+Missing Rate Limiting on Login
+
+The /login endpoint does not enforce any rate limiting, account lockout mechanism, or delay mechanism between failed attempts.
+
+Proof: Able to send 1,000 requests per minute (RPM) via Burp Intruder without response delay or IP blocking.
+
+Critical
+
+AUTH-002
+
+Weak Password Policy
+
+The password complexity requirements are insufficient, allowing passwords as short as 6 characters and common dictionary words.
+
+Proof: Successful login with the password "Welcome1" during testing.
+
+Low
+
+4. Immediate Remediation Recommendations
+
+Implement Rate Limiting (AUTH-001): Implement a robust, IP-based, and session-based rate-limiting mechanism on the /login endpoint. This should block requests exceeding 5 failed attempts per IP address/session within a 5-minute window.
+
+Implement Account Lockout (AUTH-001): After a defined number of failed attempts (e.g., 5), lock the target account for a set duration (e.g., 30 minutes) or require manual administrator intervention/email verification to unlock.
+
+Enforce Strong Password Policy (AUTH-002): Implement mandatory password requirements (minimum 12 characters, requiring mixing of uppercase, lowercase, numbers, and special symbols). Utilize a common password blocklist to prevent dictionary attacks.
